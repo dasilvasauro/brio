@@ -1,133 +1,64 @@
-import { useState } from 'react'
-import { initializeApp } from 'firebase/app'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeWrapper } from './components/ThemeWrapper';
+import { MainLayout } from './layouts/MainLayout';
+import { useUserStore } from './store/useUserStore';
+import Login from './pages/Login';
+import Onboarding from './pages/Onboarding';
+import Home from './pages/Home';
 
-function App() {
-  const [count, setCount] = useState(0)
+// Componentes temporários (vamos substituí-los nas próximas fases)
+// Componentes temporários com alinhamento rigoroso igual ao da Home
+const TempPage = () => (
+  <div className="glass p-10 rounded-3xl text-center border-dashed border-2 border-slate-300 dark:border-slate-700/50">
+    <p className="text-slate-500 font-medium text-lg">Seção em construção...</p>
+  </div>
+);
+const OnboardingTemp = () => <div className="p-4"><h1>Onboarding em construção...</h1></div>;
 
+export default function App() {
+  const user = useUserStore((state) => state.user);
+  const preferences = useUserStore((state) => state.preferences);
+
+  // Regra 1: Se não tem usuário, força ir pro Login
+  if (!user) {
+    return (
+      <ThemeWrapper>
+        <BrowserRouter>
+          <Routes>
+            <Route path="*" element={<Login />} />
+          </Routes>
+        </BrowserRouter>
+      </ThemeWrapper>
+    );
+  }
+
+  // Regra 2: Se tem usuário, mas não escolheu o Modus Operandi, força Onboarding
+  if (user && !preferences.modusOperandi) {
+    return (
+      <ThemeWrapper>
+        <BrowserRouter>
+          <Routes>
+            <Route path="*" element={<Onboarding />} />
+          </Routes>
+        </BrowserRouter>
+      </ThemeWrapper>
+    );
+  }
+
+  // Regra 3: Tudo certo, acessa o app normal
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <ThemeWrapper>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<Home title="Tarefas" />} />
+            <Route path="habitos" element={<TempPage title="Hábitos" />} />
+            <Route path="loja" element={<TempPage title="Loja" />} />
+            <Route path="perfil" element={<TempPage title="Perfil" />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ThemeWrapper>
+  );
 }
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAS9HsfgjNBoOALhJnJLCYieA1Y4jFJuyE",
-  authDomain: "brio-542cd.firebaseapp.com",
-  projectId: "brio-542cd",
-  storageBucket: "brio-542cd.firebasestorage.app",
-  messagingSenderId: "725413934386",
-  appId: "1:725413934386:web:ffc2caf1b03ab25262932b"
-};
-
-const app = initializeApp(firebaseConfig);
-
-export default App

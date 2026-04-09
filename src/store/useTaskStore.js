@@ -18,6 +18,10 @@ export const useTaskStore = create(
       })),
       addFolder: (folder) => set((state) => ({ folders: [...state.folders, folder] })),
       setDailyMood: (mood) => set({ dailyMood: mood }),
+      removeFolder: (folderId) => set((state) => ({
+        folders: state.folders.filter(f => f.id !== folderId),
+        tasks: state.tasks.map(t => t.folderId === folderId ? { ...t, folderId: 'inbox' } : t)
+      })),
     }),
     {
       name: 'brio-task-storage',
