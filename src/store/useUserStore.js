@@ -7,6 +7,7 @@ export const useUserStore = create(
       // Perfil
       user: null,
       isQA: false,
+      qaDayOffset: 0,
       
       // Economia e Gamificação
       gold: 0,
@@ -27,6 +28,8 @@ export const useUserStore = create(
       // Ações
       setUser: (userData) => set({ user: userData }),
       enableQA: () => set({ isQA: true }),
+      advanceDay: () => set((state) => ({ qaDayOffset: state.qaDayOffset + 1 })),
+      resetQA: () => set({ isQA: false, qaDayOffset: 0 }),
       addGold: (amount) => set((state) => ({ gold: state.gold + amount })),
       addVouchers: (amount) => set((state) => ({ vouchers: state.vouchers + amount })),
       updatePreferences: (newPrefs) => set((state) => ({ 
